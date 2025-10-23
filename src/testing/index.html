@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Partner Data</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        h1 { color: #008784; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Odoo Partners</h1>
+    <p>Loading data from the custom Odoo REST API...</p>
+    <div id="data-container"></div>
+
+    <script>
+        // Replace with your Odoo server URL
+        const odooApiUrl = 'http://localhost:8069/api/contacts';
+
+        async function fetchOdooPartners() {
+            const dataContainer = document.getElementById('data-container');
+            
+            try {
+                const response = await fetch(odooApiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.partners) {
+                    // Build a table to display the partner data
+                    const table = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.partners.map(partner => `
+                                    <tr>
+                                        <td>${partner.id}</td>
+                                        <td>${partner.name || 'N/A'}</td>
+                                        <td>${partner.email || 'N/A'}</td>
+                                        <td>${partner.phone || 'N/A'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    dataContainer.innerHTML = table;
+                } else {
+                    dataContainer.innerHTML = `<p>Error fetching data: ${data.message || 'Unknown error'}</p>`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                dataContainer.innerHTML = `<p>Failed to load data. Please check the console for details.</p>`;
+            }
+        }
+
+        // Call the function to fetch and display the data
+        fetchOdooPartners();
+    </script>
+</body>
+</html>
