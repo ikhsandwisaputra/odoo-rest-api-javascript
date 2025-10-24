@@ -19,10 +19,11 @@ app.use("/api", (req, res) => {
   // Contoh: /web/session/authenticate ATAU /contacts
   
   // --- PERBAIKAN DI SINI ---
-  // Jika ini adalah rute otentikasi Odoo, JANGAN tambahkan /api
-  if (req.url.startsWith("/web/session/authenticate")) {
+  // Jika ini adalah rute otentikasi Odoo atau permintaan gambar (/web/image),
+  // jangan tambahkan /api — forward langsung ke root Odoo.
+  if (req.url.startsWith("/web/session/authenticate") || req.url.startsWith("/web/image")) {
     targetUrl = `http://localhost:8069${req.url}`;
-    console.log("Proxying Auth (non-api) to:", targetUrl);
+    console.log("Proxying raw Odoo request to:", targetUrl);
   } else {
     // Untuk rute API kustom Anda (seperti /contacts), tambahkan /api
     targetUrl = `http://localhost:8069/api${req.url}`;
